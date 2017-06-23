@@ -1,0 +1,114 @@
+---
+title: "Statistical Inference Project2 - Basic Inferential Data Analysis."
+author: "Sanat Das"
+date: "6/23/2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+We need to analyze the ToothGrowth data in the R datasets package. The steps to be followed are as below:
+
+1. Load the ToothGrowth data and perform some basic exploratory data analysis
+2. Provide a basic summary of the data.
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+4. State your conclusions and the assumptions needed for your conclusions.
+
+# 1. Data Loading and basic exploratory data analysis
+
+### Loading required libraries:
+```{r}
+library(ggplot2)
+library(datasets)
+```
+
+### Loading data:
+```{r}
+data(ToothGrowth)
+```
+
+### Basic exploratory data analyses:
+```{r}
+nrow(ToothGrowth)
+head(ToothGrowth)
+str(ToothGrowth)
+```
+
+# 2. Basic Summary of the Data
+
+```{r}
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+summary(ToothGrowth)
+table(ToothGrowth$supp,ToothGrowth$dose)
+```
+
+**Tooth growth by dose and supplement type:**
+
+```{r}
+ggplot(data=ToothGrowth,aes(x=factor(dose),y=len))+facet_grid(.~supp) + geom_boxplot(aes(fill=supp),show.legend =FALSE) + labs(title="Tooth Length by dose and supp",x= "Dose (mg)", y="Tooth Length")+theme(plot.title = element_text(hjust = 0.5,face="bold"))
+
+```
+
+# 3. Use confidence intervals and/or hypothesis tests to compare Tooth growth by supp and dose
+
+As seen above, the dataset has two levels of supp: OJ and VC and three levels of dose: 0.5, 1, 2.
+
+## Testing for Supp Types
+
+Assuming the null hypothsis, H0: different supp types do not have any effect on tooth length.
+
+```{r}
+t.test(len ~ supp, data = ToothGrowth)
+```
+
+The confidence interval contains zero, and the p-value(0.06) is greater than the significance level 0.05. Hence, we can not reject the null hypothesis H0, which indicates that the supp types do not have any effect on teeth length.
+
+## Testing for Dose Level
+Assuming the null hypothsis, H0: The dose level does not have any impact on the tooth length.
+
+Create three sub-groups for dose levels:
+```{r}
+ToothGrowth.dose_type1 <- subset(ToothGrowth, dose %in% c(0.5,1.0))
+t.test(len ~ dose, data = ToothGrowth.dose_type1)
+```
+
+```{r}
+ToothGrowth.dose_type2 <- subset(ToothGrowth, dose %in% c(0.5,2.0))
+t.test(len ~ dose, data = ToothGrowth.dose_type2)
+```
+
+```{r}
+ToothGrowth.dose_type3 <- subset(ToothGrowth, dose %in% c(1.0,2.0))
+t.test(len ~ dose, data = ToothGrowth.dose_type3)
+```
+
+In all the above three cases, the p-value is less than the significance level(0.05), and the confidence interval does not contain zero. Hence, the null hypothesis H0 can be rejected. As there is a positive relationship between dose level and teeth length, the increase in dose level seems to increase in tooth growth. 
+
+# 4. Assumptions and Conclusions
+
+While analysing the data, the following assumptions were made: 
+
+1. The 60 guinea pigs taken are representative for the entire population of the guinea pigs.
+2. The supplement and dosage were randomly assigned.
+3. The distribution of the means is normal.
+
+Based on the data analysis with above assumptions, we can conclude the following:
+
+1. There is no strong evidence that Supp types have any effect on tooth growth.
+2. There is strong evidence that increase in does level leads to increase in tooth growth.
+
+
+
+
+
+
+
+
+
+
